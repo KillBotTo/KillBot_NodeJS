@@ -26,9 +26,9 @@ const killBot = new KillBot(apiKey);
 app.get('/', (req, res) => {
     killBot.checkReq(req)
         .then(result => {
+            let location = result.IPlocation; //Get IP Location
             if (result.block) {
                 // Block the user
-                let location = result.IPlocation; //Get IP Location
                 res.status(403).json({ message: 'Access denied' }); //Block access to malicious user
             } else {
                 // Allow the user
