@@ -4,7 +4,7 @@ KillBot is a Node.js module for checking and blocking potentially malicious requ
 
 ## Installation
 
-Use the package manager [KillBot.To](https://killbot.to/subscriptions) to install foobar.
+Use the package manager npm to install KillBot.To.
 
 ```bash
 npm install killbot.to -s
