@@ -1,41 +1,74 @@
-# KillBot.to PHP AntiBot
+# KillBot.to NodeJS AntiBot
 
-KillBot is a Node.js module for checking and blocking potentially malicious requests based on IP and User-Agent information. It allows you to check whether your users are potentially malicious and, at the same time, retrieve information such as their location. Use of this module requires an API key and a subscription to the [KillBot.To](https://killbot.to/subscriptions) website.
+KillBot is a Node.js module for checking and blocking potentially malicious requests based on IP and User-Agent information. It allows you to check whether your users are potentially malicious and, at the same time, retrieve information such as their location. Use of this module requires an API key and a subscription to the [KillBot.To](https://killbot.to/subscriptions) website
+
+## Installation
+
+Use the package manager npm to install KillBot.To.
+
+```bash
+npm install killbot.to -s
 ```
 
 ## Usage
+### Method 1: Using Express Middleware
 
-```php
-<?php
+```javascript
+const express = require('express');
+const KillBot = require('killbot.to');
 
-// Assuming you have the autoload setup (e.g., through composer)
-require 'vendor/autoload.php';
+const app = express();
 
-use KillBot\AntiBot;
+// Replace 'your_api_key' with your actual API key from KillBot.to
+const apiKey = 'your_api_key';
+const killBot = new KillBot(apiKey);
 
-// Your API key from KillBot.to
-$apiKey = 'YOUR_API_KEY';
+app.get('/', (req, res) => {
+    killBot.checkReq(req)
+        .then(result => {
+            let location = result.IPlocation; //Get IP Location
+            if (result.block) {
+                // Block the user
+                res.status(403).json({ message: 'Access denied' }); //Block access to malicious user
+            } else {
+                // Allow the user
+                res.json({ message: 'Welcome' });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
 
-// Create an instance of the AntiBot class
-$antiBot = new AntiBot($apiKey);
+app.listen(3000, () => {
+    console.log('Server is listening on port 3000');
+});
+```
 
-// IP and User-Agent to check
-$userIP = '127.0.0.1';
-$userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134';
+### Method 2: Manually providing IP and User-Agen
+```javascript
+const KillBot = require('killbot.to');
 
-try {
-    // Check the user using the provided IP and User-Agent
-    $result = $antiBot->check($userIP, $userAgent);
+// Replace 'your_api_key' with your actual API key from KillBot.to
+const apiKey = 'your_api_key';
+const killBot = new KillBot(apiKey);
 
-    // Process the result
-    if ($result['block']) {
-        echo 'User should be blocked. Reason: ' . $result['error'];
-    } else {
-        echo 'User is not blocked.';
-    }
-} catch (\Exception $e) {
-    echo 'An error occurred: ' . $e->getMessage();
-}
+const userIP = '192.168.0.1'; // Replace with the user's IP
+const userAgent = 'Mozilla/5.0 ...'; // Replace with the user's User-Agent
+
+killBot.check(userIP, userAgent)
+    .then(result => {
+        console.log('Check result:', result);
+        if (result.block) {
+            console.log('Block the user');
+        } else {
+            console.log('Allow the user');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 
 ```
 
