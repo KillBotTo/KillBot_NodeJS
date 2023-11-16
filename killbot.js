@@ -1,46 +1,62 @@
 const https = require('https');
 
 class KillBot {
-    // Constructor to initialize the KillBot instance with an API key
-    constructor(apiKey) {
+    /**
+     * Constructor to initialize the KillBot instance with an API key and optional config
+     * @param {string} apiKey - The API key for accessing the KillBot service.
+     * @param {string} [config='default'] - Optional configuration name.
+     */
+    constructor(apiKey, config = 'default') {
         this.apiKey = apiKey;
+        this.config = config;
     }
 
-    // Method to extract IP and User-Agent from the request
+    /**
+     * Extracts IP and User-Agent from a request object
+     * @param {object} req - The request object from which to extract information.
+     * @returns {object} An object containing the IP address and User-Agent.
+     */
     extractInfoFromReq(req) {
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const userAgent = req.headers['user-agent'];
         return { ip, userAgent };
     }
 
-    // Method to check using the extracted information from the request
+    /**
+     * Checks if a request should be blocked using the KillBot service
+     * @param {object} req - The request object to check.
+     * @returns {Promise<object>} A promise that resolves to the response from KillBot.
+     */
     async checkReq(req) {
         const { ip, userAgent } = this.extractInfoFromReq(req);
         return this.check(ip, userAgent);
     }
 
-    // Main method to check by providing IP and User-Agent
+    /**
+     * Main method to check if an IP/User-Agent should be blocked
+     * @param {string} ip - The IP address to check.
+     * @param {string} userAgent - The User-Agent string to check.
+     * @returns {Promise<object>} A promise that resolves to the response from KillBot.
+     */
     async check(ip, userAgent) {
         try {
-            // Encode the User-Agent to be included in the URL
             const encodedUserAgent = encodeURIComponent(userAgent);
-            // Construct the URL for the API call
-            const url = `https://killbot.to/api/antiBots/${this.apiKey}/check?ip=${ip}&ua=${encodedUserAgent}`;
-            // Perform an HTTP GET request
+            const url = `https://killbot.to/api/antiBots/${this.apiKey}/check?config=${this.config}&ip=${ip}&ua=${encodedUserAgent}`;
             const response = await this.httpGet(url);
-            // If there's no response, assume no blocking is needed
             if (!response) {
                 return { block: false };
             }
-            // Parse the response as JSON
             return JSON.parse(response);
         } catch (error) {
-            // If an error occurs, assume no blocking is needed and include the error message
             return { block: false, error: error.message };
         }
     }
 
-    // Method to perform an HTTP GET request
+    /**
+     * Performs an HTTP GET request
+     * @param {string} url - The URL to which the request is sent.
+     * @returns {Promise<string>} A promise that resolves to the response body as a string.
+     */
     async httpGet(url) {
         return new Promise((resolve, reject) => {
             const options = {
