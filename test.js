@@ -6,7 +6,7 @@ const app = express();
 // Replace 'your_api_key' with your actual API key from KillBot.to
 // Replace 'your_config' with your actual config name
 const apiKey = 'your_api_key';
-const config = 'your_config';
+const config = 'default';
 const killBot = new KillBot(apiKey, config);
 
 app.get('/', (req, res) => {
