@@ -20,19 +20,21 @@ const KillBot = require('killbot.to');
 const app = express();
 
 // Replace 'your_api_key' with your actual API key from KillBot.to
+// Replace 'your_config' with your actual config name
 const apiKey = 'your_api_key';
-const killBot = new KillBot(apiKey);
+const config = 'default';
+const killBot = new KillBot(apiKey, config);
 
 app.get('/', (req, res) => {
     killBot.checkReq(req)
         .then(result => {
-            let location = result.IPlocation; //Get IP Location
             if (result.block) {
                 // Block the user
-                res.status(403).json({ message: 'Access denied' }); //Block access to malicious user
+                res.status(403).json({ message: 'Access denied' });
             } else {
                 // Allow the user
-                res.json({ message: 'Welcome' });
+                let location = result.IPlocation; //Get IP Location
+                res.json({ message: 'Welcome', location: location });
             }
         })
         .catch(error => {
@@ -44,6 +46,7 @@ app.get('/', (req, res) => {
 app.listen(3000, () => {
     console.log('Server is listening on port 3000');
 });
+
 ```
 
 ### Method 2: Manually providing IP and User-Agen
@@ -51,24 +54,26 @@ app.listen(3000, () => {
 const KillBot = require('killbot.to');
 
 // Replace 'your_api_key' with your actual API key from KillBot.to
+// Replace 'your_config' with your actual config name
 const apiKey = 'your_api_key';
-const killBot = new KillBot(apiKey);
+const config = 'default';
+const killBot = new KillBot(apiKey, config);
 
 const userIP = '192.168.0.1'; // Replace with the user's IP
 const userAgent = 'Mozilla/5.0 ...'; // Replace with the user's User-Agent
 
 killBot.check(userIP, userAgent)
-    .then(result => {
-        console.log('Check result:', result);
-        if (result.block) {
-            console.log('Block the user');
-        } else {
-            console.log('Allow the user');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+.then(result => {
+    console.log('Check result:', result);
+    if (result.block) {
+        console.log('Block the user');
+    } else {
+        console.log('Allow the user');
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+});
 
 ```
 
