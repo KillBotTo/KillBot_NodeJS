@@ -1,0 +1,24 @@
+{
+  "name": "killbot.to",
+  "version": "1.1.0",
+  "description": "KillBot.to is an anti-bot solution that allows you to check whether your users are potentially malicious and at the same time retrieve information such as their location.",
+  "main": "killbot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KillBotTo/KillBot_NodeJS.git"
+  },
+  "keywords": [
+    "killbot",
+    "antibot",
+    "killbot"
+  ],
+  "author": "killbot.to",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KillBotTo/KillBot_NodeJS/issues"
+  },
+  "homepage": "https://github.com/KillBotTo/KillBot_NodeJS#readme"
+}
