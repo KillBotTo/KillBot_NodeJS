@@ -114,6 +114,20 @@ class KillBot {
             }).on('error', e => reject(new Error('Killbot.to error: ' + e.message)));
         });
     }
+    
+    /**
+     * Retrieves the usage statistics of the KillBot API.
+     * @returns {Promise<object>} A promise that resolves to the API's usage statistics.
+     */
+    async getUsage() {
+        try {
+            const response = await this.httpGet(`https://killbot.to/api/antiBots/${this.apiKey}/getUsage`);
+            return response; // Already parsed in httpGet
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    }
+
 }
 
 module.exports = KillBot;
