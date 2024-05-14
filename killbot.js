@@ -50,53 +50,24 @@ class KillBot {
             throw new Error("Invalid IP address provided.");
         }
         const encodedUserAgent = encodeURIComponent(userAgent);
-        const url = `https://killbot.to/api/antiBots/${this.apiKey}/check?config=${this.config}&ip=${ip}&ua=${encodedUserAgent}`;
+        const url = `https://api.killbot.to/check?config=${this.config}&ip=${ip}&ua=${encodedUserAgent}`;
         return await this.httpGet(url);
     }
 
     /**
-     * Validates an IP address against IPv4 and IPv6 patterns.
-     * @param {string} ip - The IP address to validate.
-     * @returns {boolean} True if the IP address is valid (either IPv4 or IPv6), false otherwise.
-     */
-    isValidIp(ip) {
-        const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-        const ipv6Regex = /^([\da-fA-F]{1,4}:){7}([\da-fA-F]{1,4}|:)|::([\da-fA-F]{1,4}:){0,5}([\da-fA-F]{1,4}|:)(?!.*::.*::)|([\da-fA-F]{1,4}:){1,6}:$/;
-        return ipv4Regex.test(ip) || ipv6Regex.test(ip);
-    }
-
-    /**
-     * Checks if an IP address is considered local (private network IP).
-     * This includes IPv4 loopback, private network ranges, and IPv6 local addresses.
-     * @param {string} ip - The IP address to check.
-     * @returns {boolean} True if the IP is local, false otherwise.
-     */
-    isLocalIp(ip) {
-        const localIpv4Patterns = [
-            /^127\./,        // IPv4 loopback
-            /^10\./,         // IPv4 private network (10.0.0.0 - 10.255.255.255)
-            /^172\.(1[6-9]|2[0-9]|3[0-1])\./,  // IPv4 private network (172.16.0.0 - 172.31.255.255)
-            /^192\.168\./    // IPv4 private network (192.168.0.0 - 192.168.255.255)
-        ];
-
-        const localIpv6Patterns = [
-            /^::1$/,             // IPv6 loopback
-            /^fc00:/,            // IPv6 unique local address
-            /^fd00:/             // IPv6 unique local address
-        ];
-
-        return localIpv4Patterns.some(pattern => pattern.test(ip)) || localIpv6Patterns.some(pattern => pattern.test(ip));
-    }
-
-    /**
      * Makes an HTTP GET request to a specified URL and returns the JSON-parsed response.
-     * Handles errors during the HTTP request or while parsing the response.
+     * Adjusted to include the API key in the header.
      * @param {string} url - The URL to which the GET request is made.
      * @returns {Promise<object>} A promise that resolves to the parsed JSON response or rejects with an error.
      */
     async httpGet(url) {
         return new Promise((resolve, reject) => {
-            const options = { headers: { 'User-Agent': 'KillBot.to Blocker-NodeJS' }};
+            const options = {
+                headers: {
+                    'User-Agent': 'KillBot.to Blocker-NodeJS',
+                    'X-API-Key': this.apiKey
+                }
+            };
             https.get(url, options, (res) => {
                 let data = '';
                 res.on('data', chunk => data += chunk);
@@ -117,11 +88,12 @@ class KillBot {
 
     /**
      * Retrieves the usage statistics of the KillBot API.
+     * Updated the URL to match the new base path.
      * @returns {Promise<object>} A promise that resolves to the API's usage statistics.
      */
     async getUsage() {
         try {
-            const response = await this.httpGet(`https://killbot.to/api/antiBots/${this.apiKey}/getUsage`);
+            const response = await this.httpGet(`https://api.killbot.to/getUsages`);
             return response; // Already parsed in httpGet
         } catch (e) {
             return { success: false, error: e.message };

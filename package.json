@@ -1,6 +1,6 @@
 {
   "name": "killbot.to",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "KillBot.to is an anti-bot solution that allows you to check whether your users are potentially malicious and at the same time retrieve information such as their location.",
   "main": "killbot.js",
   "scripts": {
