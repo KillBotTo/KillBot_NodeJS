@@ -1,4 +1,5 @@
 const https = require('https');
+const net = require('net');
 
 class KillBot {
     /**
@@ -98,6 +99,35 @@ class KillBot {
         } catch (e) {
             return { success: false, error: e.message };
         }
+    }
+
+    /**
+     * Checks if an IP address is local.
+     * @param {string} ip - The IP address to check.
+     * @returns {boolean} True if the IP is local, false otherwise.
+     */
+    isLocalIp(ip) {
+        // Define local IP ranges
+        const localRanges = [
+            /^127\./, // 127.0.0.0/8
+            /^10\./, // 10.0.0.0/8
+            /^172\.(1[6-9]|2[0-9]|3[0-1])\./, // 172.16.0.0/12
+            /^192\.168\./, // 192.168.0.0/16
+            /^::1$/, // Loopback IPv6
+            /^fc00:/, // Unique local address IPv6
+            /^fe80:/ // Link-local address IPv6
+        ];
+
+        return localRanges.some((range) => range.test(ip));
+    }
+
+    /**
+     * Validates if an IP address is valid.
+     * @param {string} ip - The IP address to validate.
+     * @returns {boolean} True if the IP address is valid, false otherwise.
+     */
+    isValidIp(ip) {
+        return net.isIP(ip) !== 0;
     }
 }
 
