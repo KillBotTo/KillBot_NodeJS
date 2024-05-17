@@ -1,5 +1,6 @@
 const https = require('https');
 const net = require('net');
+const querystring = require('querystring');
 
 class KillBot {
     /**
@@ -50,26 +51,37 @@ class KillBot {
         if (!this.isValidIp(ip)) {
             throw new Error("Invalid IP address provided.");
         }
-        const encodedUserAgent = encodeURIComponent(userAgent);
-        const url = `https://api.killbot.to/check?config=${this.config}&ip=${ip}&ua=${encodedUserAgent}`;
-        return await this.httpGet(url);
+
+        const postData = querystring.stringify({
+            config: this.config,
+            ip: ip,
+            ua: userAgent
+        });
+
+        const options = {
+            hostname: 'api.killbot.to',
+            path: '/check',
+            method: 'POST',
+            headers: {
+                'User-Agent': 'KillBot.to Blocker-NodeJS',
+                'X-API-Key': this.apiKey,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        return await this.httpPost(options, postData);
     }
 
     /**
-     * Makes an HTTP GET request to a specified URL and returns the JSON-parsed response.
-     * Adjusted to include the API key in the header.
-     * @param {string} url - The URL to which the GET request is made.
+     * Makes an HTTP POST request to a specified URL and returns the JSON-parsed response.
+     * @param {object} options - The options for the HTTP request.
+     * @param {string} data - The data to be sent in the POST request body.
      * @returns {Promise<object>} A promise that resolves to the parsed JSON response or rejects with an error.
      */
-    async httpGet(url) {
+    async httpPost(options, data) {
         return new Promise((resolve, reject) => {
-            const options = {
-                headers: {
-                    'User-Agent': 'KillBot.to Blocker-NodeJS',
-                    'X-API-Key': this.apiKey
-                }
-            };
-            https.get(url, options, (res) => {
+            const req = https.request(options, (res) => {
                 let data = '';
                 res.on('data', chunk => data += chunk);
                 res.on('end', () => {
@@ -83,13 +95,17 @@ class KillBot {
                         reject(new Error('Killbot.to error: ' + err.message));
                     }
                 });
-            }).on('error', e => reject(new Error('Killbot.to error: ' + e.message)));
+            });
+
+            req.on('error', e => reject(new Error('Killbot.to error: ' + e.message)));
+
+            req.write(data);
+            req.end();
         });
     }
 
     /**
      * Retrieves the usage statistics of the KillBot API.
-     * Updated the URL to match the new base path.
      * @returns {Promise<object>} A promise that resolves to the API's usage statistics.
      */
     async getUsage() {
