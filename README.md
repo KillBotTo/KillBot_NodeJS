@@ -1,6 +1,7 @@
 # KillBot.to NodeJS AntiBot
 
-KillBot is a Node.js module for checking and blocking potentially malicious requests based on IP and User-Agent information. It allows you to check whether your users are potentially malicious and, at the same time, retrieve information such as their location. Use of this module requires an API key and a subscription to the [KillBot.To](https://killbot.to/subscriptions) website
+KillBot is a Node.js module for checking and blocking potentially malicious requests based on IP and User-Agent information. It allows you to check whether your users are potentially malicious and, at the same time, retrieve information such as their location. Use of this module requires an API key and a subscription to the [KillBot.To](https://killbot.to/subscriptions) website.
+The documentation is available at [documentation.killbot.to](https://documentation.killbot.to/).
 
 ## Installation
 
