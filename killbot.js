@@ -105,12 +105,44 @@ class KillBot {
     }
 
     /**
+     * Makes an HTTP GET request to a specified URL and returns the JSON-parsed response.
+     * @param {string} url - The URL to send the GET request to.
+     * @returns {Promise<object>} A promise that resolves to the parsed JSON response or rejects with an error.
+     */
+    async httpGet(url) {
+        return new Promise((resolve, reject) => {
+            const options = {
+                hostname: 'api.killbot.to',
+                path: url,
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'KillBot.to Blocker-NodeJS',
+                    'X-API-Key': this.apiKey
+                }
+            };
+
+            https.get(options, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                    try {
+                        const response = JSON.parse(data);
+                        resolve(response);
+                    } catch (err) {
+                        reject(new Error('Killbot.to error: ' + err.message));
+                    }
+                });
+            }).on('error', e => reject(new Error('Killbot.to error: ' + e.message)));
+        });
+    }
+
+    /**
      * Retrieves the usage statistics of the KillBot API.
      * @returns {Promise<object>} A promise that resolves to the API's usage statistics.
      */
     async getUsage() {
         try {
-            const response = await this.httpGet(`https://api.killbot.to/getUsages`);
+            const response = await this.httpGet(`https://api.killbot.to/getUsage`);
             return response; // Already parsed in httpGet
         } catch (e) {
             return { success: false, error: e.message };
